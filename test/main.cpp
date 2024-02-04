@@ -22,7 +22,7 @@ int main() {
     static bool flag = true;
     while (flag) {
         graphics->NewFrame();
-
+        Touch::setOrientation(android::ANativeWindowCreator::GetDisplayInfo().orientation);
         ImGui::SetNextWindowSize({500, 500}, ImGuiCond_Once);
         if (ImGui::Begin("test", &flag)) {
             ImGui::Text("Hello, world!");

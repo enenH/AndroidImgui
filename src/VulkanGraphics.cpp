@@ -256,13 +256,14 @@ void VulkanGraphics::Setup() {
     init_info.Queue = m_Queue;
     init_info.PipelineCache = m_PipelineCache;
     init_info.DescriptorPool = m_DescriptorPool;
+    init_info.RenderPass = wd->RenderPass;
     init_info.Subpass = 0;
     init_info.MinImageCount = m_MinImageCount;
     init_info.ImageCount = wd->ImageCount;
     init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
     init_info.Allocator = m_Allocator;
     init_info.CheckVkResultFn = check_vk_result;
-    ImGui_ImplVulkan_Init(&init_info, wd->RenderPass);
+    ImGui_ImplVulkan_Init(&init_info);
 }
 
 void VulkanGraphics::PrepareFrame(bool resize) {

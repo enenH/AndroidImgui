@@ -49,9 +49,10 @@ target_link_libraries(AndroidImgui
         GLESv3
         z)
 
-#[[
+
 add_executable(AndroidImguiTest
-        test/main.cpp)
+        test/main.cpp
+        test/TouchHelperA.cpp)
 
 target_link_libraries(AndroidImguiTest
         AndroidImgui
@@ -59,4 +60,4 @@ target_link_libraries(AndroidImguiTest
         android
         EGL
         GLESv3
-        z)]]
+        z)

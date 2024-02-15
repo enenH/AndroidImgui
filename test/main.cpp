@@ -1,7 +1,5 @@
-#include "AndroidImgui.h"
 #include "ANativeWindowCreator.h"
 #include "GraphicsManager.h"
-#include "imgui.h"
 #include "my_imgui.h"
 #include "TouchHelperA.h"
 
@@ -32,6 +30,7 @@ int main() {
 
         graphics->EndFrame();
     }
+    graphics->DeleteTexture(image);
     graphics->Shutdown();
     return 0;
 }

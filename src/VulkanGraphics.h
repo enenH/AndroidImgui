@@ -36,6 +36,8 @@ private:
     int m_MinImageCount = 2;
     bool m_SwapChainRebuild = false;
 
+    int m_LastWidth = 0;
+    int m_LastHeight = 0;
 public:
     bool Create() override;
 

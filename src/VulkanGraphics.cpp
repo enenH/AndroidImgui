@@ -3,6 +3,7 @@
 #include "VulkanGraphics.h"
 #include "imgui_impl_vulkan.h"
 #include <vulkan/vulkan_android.h>
+#include <android/native_window.h>
 
 #ifndef NDEBUG
 
@@ -267,6 +268,25 @@ void VulkanGraphics::Setup() {
 }
 
 void VulkanGraphics::PrepareFrame(bool resize) {
+    if (m_SwapChainRebuild || resize) {
+        if (m_LastWidth == 0 || m_LastHeight == 0) {
+            m_LastWidth = (int) m_Width;
+            m_LastHeight = (int) m_Height;
+        }
+        int width = ANativeWindow_getWidth(m_Window);
+        int height = ANativeWindow_getHeight(m_Window);
+        if (width > 0 && height > 0) {
+            if (width != m_LastWidth || height != m_LastHeight) {
+                m_LastWidth = width;
+                m_LastHeight = height;
+                ImGui_ImplVulkan_SetMinImageCount(m_MinImageCount);
+                ImGui_ImplVulkanH_CreateOrResizeWindow(m_Instance, m_PhysicalDevice, m_Device, wd.get(),
+                                                       m_QueueFamily, m_Allocator, width, height, m_MinImageCount);
+                wd->FrameIndex = 0;
+                m_SwapChainRebuild = false;
+            }
+        }
+    }
     ImGui_ImplVulkan_NewFrame();
 }
 
@@ -278,7 +298,7 @@ void VulkanGraphics::Render(ImDrawData *drawData) {
     err = vkAcquireNextImageKHR(m_Device, wd->Swapchain, UINT64_MAX, image_acquired_semaphore, VK_NULL_HANDLE,
                                 &wd->FrameIndex);
     if (err == VK_ERROR_OUT_OF_DATE_KHR /*|| err == VK_SUBOPTIMAL_KHR*/) {
-        //g_SwapChainRebuild = true;
+        m_SwapChainRebuild = true;
         return;
     }
     //check_vk_result(err);
@@ -351,7 +371,7 @@ void VulkanGraphics::Render(ImDrawData *drawData) {
         info.pImageIndices = &wd->FrameIndex;
         VkResult err = vkQueuePresentKHR(m_Queue, &info);
         if (err == VK_ERROR_OUT_OF_DATE_KHR /*|| err == VK_SUBOPTIMAL_KHR*/) {
-            //g_SwapChainRebuild = true;
+            m_SwapChainRebuild = true;
             return;
         }
         //check_vk_result(err);

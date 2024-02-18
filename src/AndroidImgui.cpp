@@ -51,6 +51,7 @@ void AndroidImgui::Shutdown() {
     m_Textures.clear();
     PrepareShutdown();
     My_ImGui_ImplAndroid_Shutdown();
+    ImGui::DestroyContext();
     Cleanup();
     ANativeWindow_release(m_Window);
 }

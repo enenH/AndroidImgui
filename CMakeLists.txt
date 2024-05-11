@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.22)
 
 if (NOT DEFINED CMAKE_ANDROID_NDK)
     set(CMAKE_ANDROID_NDK D:/Android/SDK/ndk/26.1.10909125)

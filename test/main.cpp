@@ -15,8 +15,6 @@ int main() {
     ImGui::Android_LoadSystemFont(26);
     Touch::Init({(float) display.width, (float) display.height}, true);
 
-    //auto image = graphics->LoadTextureFromFile("/sdcard/1.png");
-
     static bool flag = true;
     while (flag) {
         graphics->NewFrame();
@@ -24,13 +22,12 @@ int main() {
         ImGui::SetNextWindowSize({500, 500}, ImGuiCond_Once);
         if (ImGui::Begin("test", &flag)) {
             ImGui::Text("Hello, world!");
-          //  ImGui::Image(image->DS, {100, 100});
+
         }
         ImGui::End();
 
         graphics->EndFrame();
     }
-   // graphics->DeleteTexture(image);
     graphics->Shutdown();
     return 0;
 }

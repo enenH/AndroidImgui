@@ -181,6 +181,14 @@ namespace android {
 
                 static std::unordered_map<size_t, std::unordered_map<void **, const char *>> patchesTable = {
                         {
+                                15,
+                                {
+                                        {reinterpret_cast<void **>(&LayerMetadata__Constructor),               "_ZN7android3gui13LayerMetadataC2Ev"},
+                                        {reinterpret_cast<void **>(&SurfaceComposerClient__CreateSurface),     "_ZN7android21SurfaceComposerClient13createSurfaceERKNS_7String8EjjiiRKNS_2spINS_7IBinderEEENS_3gui13LayerMetadataEPj"},
+                                        {reinterpret_cast<void **>(&LayerMetadata__setInt32),                  "_ZN7android3gui13LayerMetadata8setInt32Eji"},
+                                },
+                        },
+                        {
                                 14,
                                 {
                                         {reinterpret_cast<void **>(&LayerMetadata__Constructor),                "_ZN7android3gui13LayerMetadataC2Ev"},
@@ -284,7 +292,7 @@ namespace android {
                 symbolMethod.Close(libutils);
                 symbolMethod.Close(libgui);
             }
-
+            
             static const Functionals &
             GetInstance(const SymbolMethod &symbolMethod = {.Open = dlopen, .Find = dlsym, .Close = dlclose}) {
                 static Functionals functionals(symbolMethod);
@@ -467,9 +475,9 @@ namespace android {
                     defaultDisplay = Functionals::GetInstance().SurfaceComposerClient__GetBuiltInDisplay(
                             ui::DisplayType::DisplayIdMain);
                 else {
-                    if (14 > Functionals::GetInstance().systemVersion)
+                    if (14 > Functionals::GetInstance().systemVersion) {
                         defaultDisplay = Functionals::GetInstance().SurfaceComposerClient__GetInternalDisplayToken();
-                    else {
+                    } else {
                         auto displayIds = Functionals::GetInstance().SurfaceComposerClient__GetPhysicalDisplayIds();
                         if (displayIds.empty())
                             return false;
@@ -482,7 +490,7 @@ namespace android {
                 if (nullptr == defaultDisplay.get())
                     return false;
 
-                if (11 <= Functionals::GetInstance().systemVersion)
+                if (11 <= Functionals::GetInstance().systemVersion || Functionals::GetInstance().systemVersion > 14)
                     return 0 == Functionals::GetInstance().SurfaceComposerClient__GetDisplayState(defaultDisplay,
                                                                                                   displayInfo);
                 else {
@@ -522,7 +530,20 @@ namespace android {
 
             if (!surfaceComposerClient.GetDisplayInfo(&displayInfo))
                 return {};
-
+                
+            if (detail::Functionals::GetInstance().systemVersion <= 10) {
+                DisplayInfo mDisplayInfo{};
+                if (static_cast<uint32_t>(displayInfo.orientation) == 1 || static_cast<uint32_t>(displayInfo.orientation) == 3) {
+                    mDisplayInfo.width = displayInfo.layerStackSpaceRect.height;
+                    mDisplayInfo.height = displayInfo.layerStackSpaceRect.width;
+                } else {
+                    mDisplayInfo.width = displayInfo.layerStackSpaceRect.width;
+                    mDisplayInfo.height = displayInfo.layerStackSpaceRect.height;
+                }
+                mDisplayInfo.orientation = static_cast<uint32_t>(displayInfo.orientation);
+                return mDisplayInfo;
+            }
+            
             return DisplayInfo{
                     .orientation = static_cast<uint32_t>(displayInfo.orientation),
                     .width = displayInfo.layerStackSpaceRect.width,
@@ -539,10 +560,20 @@ namespace android {
 
                 if (!surfaceComposerClient.GetDisplayInfo(&displayInfo))
                     break;
-
-                width = displayInfo.layerStackSpaceRect.width;
-                height = displayInfo.layerStackSpaceRect.height;
-
+                    
+                if (detail::Functionals::GetInstance().systemVersion <= 10) {
+                    if (static_cast<uint32_t>(displayInfo.orientation) == 1 || static_cast<uint32_t>(displayInfo.orientation) == 3) {
+                        width = displayInfo.layerStackSpaceRect.height;
+                        height = displayInfo.layerStackSpaceRect.width;
+                    } else {
+                        width = displayInfo.layerStackSpaceRect.width;
+                        height = displayInfo.layerStackSpaceRect.height;
+                    }
+                } else {
+                    width = displayInfo.layerStackSpaceRect.width;
+                    height = displayInfo.layerStackSpaceRect.height;
+                }
+                
                 break;
             }
 

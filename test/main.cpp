@@ -2,6 +2,7 @@
 #include "GraphicsManager.h"
 #include "my_imgui.h"
 #include "TouchHelperA.h"
+#include "vedrana.h"
 
 int main() {
     auto display = android::ANativeWindowCreator::GetDisplayInfo();
@@ -12,7 +13,12 @@ int main() {
     auto graphics = GraphicsManager::getGraphicsInterface(GraphicsManager::VULKAN);
 
     graphics->Init(window, display.width, display.width);
-    ImGui::Android_LoadSystemFont(26);
+
+    // ImGui::Android_LoadSystemFont(26); 
+    // this function will be fixed. now its not work for android 15
+    ImGuiIO &io = ImGui::GetIO();
+    io.Fonts->AddFontFromMemoryTTF(&verdana, sizeof verdana, 26, NULL);
+
     Touch::Init({(float) display.width, (float) display.height}, true);
 
     static bool flag = true;

@@ -16,6 +16,10 @@ project(AndroidImgui)
 
 set(CMAKE_CXX_STANDARD 20)
 
+add_subdirectory(freetype)
+
+include_directories(freetype/include)
+
 file(GLOB SOURCES src/*.cpp)
 
 add_library(AndroidImgui STATIC
@@ -29,7 +33,9 @@ add_library(AndroidImgui STATIC
         imgui/imgui_tables.cpp
         imgui/imgui_demo.cpp
         imgui/backends/imgui_impl_opengl3.cpp
-        imgui/backends/imgui_impl_vulkan.cpp)
+        imgui/backends/imgui_impl_vulkan.cpp
+        imgui/misc/freetype/imgui_freetype.cpp
+)
 
 target_include_directories(AndroidImgui PUBLIC
         src
@@ -40,7 +46,8 @@ target_include_directories(AndroidImgui PUBLIC
 
 target_compile_definitions(AndroidImgui PUBLIC
         VK_USE_PLATFORM_ANDROID_KHR
-        IMGUI_IMPL_VULKAN_NO_PROTOTYPES)
+        IMGUI_IMPL_VULKAN_NO_PROTOTYPES
+        IMGUI_ENABLE_FREETYPE)
 
 target_link_libraries(AndroidImgui
         log
@@ -50,9 +57,14 @@ target_link_libraries(AndroidImgui
         z)
 
 
-#[[add_executable(AndroidImguiTest
+
+add_executable(AndroidImguiTest
         test/main.cpp
         test/TouchHelperA.cpp)
 
 target_link_libraries(AndroidImguiTest
-        AndroidImgui)]]
+        AndroidImgui
+        freetype
+)
+
+#[[git submodule update --remote imgui]]

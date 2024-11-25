@@ -86,89 +86,90 @@ namespace android {
 
         struct SurfaceComposerClient;
 
-        template<typename any_t>
+        template <typename any_t>
         struct StrongPointer {
             union {
-                any_t *pointer;
+                any_t* pointer;
                 char padding[sizeof(std::max_align_t)];
             };
 
-            inline any_t *operator->() const { return pointer; }
+            inline any_t* operator->() const { return pointer; }
 
-            inline any_t *get() const { return pointer; }
+            inline any_t* get() const { return pointer; }
 
             inline explicit operator bool() const { return nullptr != pointer; }
         };
 
         struct Functionals {
             struct SymbolMethod {
-                void *(*Open)(const char *filename, int flag) = nullptr;
+                void*(*Open)(const char* filename, int flag) = nullptr;
 
-                void *(*Find)(void *handle, const char *symbol) = nullptr;
+                void*(*Find)(void* handle, const char* symbol) = nullptr;
 
-                int (*Close)(void *handle) = nullptr;
+                int (*Close)(void* handle) = nullptr;
             };
 
             size_t systemVersion = 13;
 
-            void (*RefBase__IncStrong)(void *thiz, void *id) = nullptr;
+            void (*RefBase__IncStrong)(void* thiz, void* id) = nullptr;
 
-            void (*RefBase__DecStrong)(void *thiz, void *id) = nullptr;
+            void (*RefBase__DecStrong)(void* thiz, void* id) = nullptr;
 
-            void (*String8__Constructor)(void *thiz, const char *const data) = nullptr;
+            void (*String8__Constructor)(void* thiz, const char* const data) = nullptr;
 
-            void (*String8__Destructor)(void *thiz) = nullptr;
+            void (*String8__Destructor)(void* thiz) = nullptr;
 
-            void (*LayerMetadata__Constructor)(void *thiz) = nullptr;
+            void (*LayerMetadata__Constructor)(void* thiz) = nullptr;
 
-            void (*LayerMetadata__setInt32)(void *thiz, uint32_t type, int32_t value) = nullptr;
+            void (*LayerMetadata__setInt32)(void* thiz, uint32_t type, int32_t value) = nullptr;
 
-            void (*SurfaceComposerClient__Constructor)(void *thiz) = nullptr;
+            void (*SurfaceComposerClient__Constructor)(void* thiz) = nullptr;
 
-            void (*SurfaceComposerClient__Destructor)(void *thiz) = nullptr;
+            void (*SurfaceComposerClient__Destructor)(void* thiz) = nullptr;
 
             StrongPointer<void>
-            (*SurfaceComposerClient__CreateSurface)(void *thiz, void *name, uint32_t w, uint32_t h, int32_t format,
-                                                    uint32_t flags, void *parentHandle, void *layerMetadata,
-                                                    uint32_t *outTransformHint) = nullptr;
+            (*SurfaceComposerClient__CreateSurface)(void* thiz, void* name, uint32_t w, uint32_t h, int32_t format,
+                                                    uint32_t flags, void* parentHandle, void* layerMetadata,
+                                                    uint32_t* outTransformHint) = nullptr;
 
             StrongPointer<void> (*SurfaceComposerClient__GetInternalDisplayToken)() = nullptr;
 
             StrongPointer<void> (*SurfaceComposerClient__GetBuiltInDisplay)(ui::DisplayType type) = nullptr;
 
-            int32_t (*SurfaceComposerClient__GetDisplayState)(StrongPointer<void> &display,
-                                                              ui::DisplayState *displayState) = nullptr;
+            int32_t (*SurfaceComposerClient__GetDisplayState)(StrongPointer<void>& display,
+                                                              ui::DisplayState* displayState) = nullptr;
 
-            int32_t (*SurfaceComposerClient__GetDisplayInfo)(StrongPointer<void> &display,
-                                                             ui::DisplayInfo *displayInfo) = nullptr;
+            int32_t (*SurfaceComposerClient__GetDisplayInfo)(StrongPointer<void>& display,
+                                                             ui::DisplayInfo* displayInfo) = nullptr;
 
             std::vector<ui::PhysicalDisplayId> (*SurfaceComposerClient__GetPhysicalDisplayIds)() = nullptr;
 
             StrongPointer<void>
             (*SurfaceComposerClient__GetPhysicalDisplayToken)(ui::PhysicalDisplayId displayId) = nullptr;
 
-            void (*SurfaceComposerClient__Transaction__Constructor)(void *thiz) = nullptr;
+            void (*SurfaceComposerClient__Transaction__Constructor)(void* thiz) = nullptr;
 
-            void *(*SurfaceComposerClient__Transaction__SetLayer)(void *thiz, StrongPointer<void> &surfaceControl,
-                                                                  int32_t z) = nullptr;
+            void*(*SurfaceComposerClient__Transaction__SetLayer)(void* thiz, StrongPointer<void>& surfaceControl,
+                                                                 int32_t z) = nullptr;
 
-            void *
-            (*SurfaceComposerClient__Transaction__SetTrustedOverlay)(void *thiz, StrongPointer<void> &surfaceControl,
-                                                                     bool isTrustedOverlay) = nullptr;
+            void*
+                (*SurfaceComposerClient__Transaction__SetTrustedOverlay)(
+                    void* thiz, StrongPointer<void>& surfaceControl,
+                    bool isTrustedOverlay) = nullptr;
 
-            int32_t (*SurfaceComposerClient__Transaction__Apply)(void *thiz, bool synchronous, bool oneWay) = nullptr;
+            int32_t (*SurfaceComposerClient__Transaction__Apply)(void* thiz, bool synchronous, bool oneWay) = nullptr;
 
-            int32_t (*SurfaceControl__Validate)(void *thiz) = nullptr;
+            int32_t (*SurfaceControl__Validate)(void* thiz) = nullptr;
 
-            StrongPointer<Surface> (*SurfaceControl__GetSurface)(void *thiz) = nullptr;
+            StrongPointer<Surface> (*SurfaceControl__GetSurface)(void* thiz) = nullptr;
 
-            void (*SurfaceControl__DisConnect)(void *thiz) = nullptr;
+            void (*SurfaceControl__DisConnect)(void* thiz) = nullptr;
 
-            Functionals(const SymbolMethod &symbolMethod) {
+            Functionals(const SymbolMethod& symbolMethod) {
                 std::string systemVersionString(128, 0);
 
                 systemVersionString.resize(
-                        __system_property_get("ro.build.version.release", systemVersionString.data()));
+                    __system_property_get("ro.build.version.release", systemVersionString.data()));
                 if (!systemVersionString.empty())
                     systemVersion = std::stoi(systemVersionString);
 
@@ -179,52 +180,108 @@ namespace android {
                     return;
                 }
 
-                static std::unordered_map<size_t, std::unordered_map<void **, const char *>> patchesTable = {
+                static std::unordered_map<size_t, std::unordered_map<void**, const char*>> patchesTable = {
+                    {
+                        15,
                         {
-                                14,
-                                {
-                                        {reinterpret_cast<void **>(&LayerMetadata__Constructor),                "_ZN7android3gui13LayerMetadataC2Ev"},
-                                        {reinterpret_cast<void **>(&SurfaceComposerClient__CreateSurface),     "_ZN7android21SurfaceComposerClient13createSurfaceERKNS_7String8EjjiiRKNS_2spINS_7IBinderEEENS_3gui13LayerMetadataEPj"},
-                                },
+                            {
+                                reinterpret_cast<void**>(&LayerMetadata__Constructor),
+                                "_ZN7android3gui13LayerMetadataC2Ev"
+                            },
+                            {
+                                reinterpret_cast<void**>(&SurfaceComposerClient__CreateSurface),
+                                "_ZN7android21SurfaceComposerClient13createSurfaceERKNS_7String8EjjiiRKNS_2spINS_7IBinderEEENS_3gui13LayerMetadataEPj"
+                            },
+                            {
+                                reinterpret_cast<void**>(&LayerMetadata__setInt32),
+                                "_ZN7android3gui13LayerMetadata8setInt32Eji"
+                            },
                         },
+                    },
+                    {
+                        14,
                         {
-                                12,
-                                {
-                                        {reinterpret_cast<void **>(&SurfaceComposerClient__Transaction__Apply), "_ZN7android21SurfaceComposerClient11Transaction5applyEb"},
-                                },
+                            {
+                                reinterpret_cast<void**>(&LayerMetadata__Constructor),
+                                "_ZN7android3gui13LayerMetadataC2Ev"
+                            },
+                            {
+                                reinterpret_cast<void**>(&SurfaceComposerClient__CreateSurface),
+                                "_ZN7android21SurfaceComposerClient13createSurfaceERKNS_7String8EjjiiRKNS_2spINS_7IBinderEEENS_3gui13LayerMetadataEPj"
+                            },
                         },
+                    },
+                    {
+                        12,
                         {
-                                11,
-                                {
-                                        {reinterpret_cast<void **>(&SurfaceComposerClient__CreateSurface),      "_ZN7android21SurfaceComposerClient13createSurfaceERKNS_7String8EjjijPNS_14SurfaceControlENS_13LayerMetadataEPj"},
-                                        {reinterpret_cast<void **>(&SurfaceControl__GetSurface),               "_ZNK7android14SurfaceControl10getSurfaceEv"},
-                                },
+                            {
+                                reinterpret_cast<void**>(&SurfaceComposerClient__Transaction__Apply),
+                                "_ZN7android21SurfaceComposerClient11Transaction5applyEb"
+                            },
                         },
+                    },
+                    {
+                        11,
                         {
-                                10,
-                                {
-                                        {reinterpret_cast<void **>(&SurfaceComposerClient__CreateSurface),      "_ZN7android21SurfaceComposerClient13createSurfaceERKNS_7String8EjjijPNS_14SurfaceControlENS_13LayerMetadataE"},
-                                        {reinterpret_cast<void **>(&SurfaceControl__GetSurface),               "_ZNK7android14SurfaceControl10getSurfaceEv"},
-                                },
+                            {
+                                reinterpret_cast<void**>(&SurfaceComposerClient__CreateSurface),
+                                "_ZN7android21SurfaceComposerClient13createSurfaceERKNS_7String8EjjijPNS_14SurfaceControlENS_13LayerMetadataEPj"
+                            },
+                            {
+                                reinterpret_cast<void**>(&SurfaceControl__GetSurface),
+                                "_ZNK7android14SurfaceControl10getSurfaceEv"
+                            },
                         },
+                    },
+                    {
+                        10,
                         {
-                                9,
-                                {
+                            {
+                                reinterpret_cast<void**>(&SurfaceComposerClient__CreateSurface),
+                                "_ZN7android21SurfaceComposerClient13createSurfaceERKNS_7String8EjjijPNS_14SurfaceControlENS_13LayerMetadataE"
+                            },
+                            {
+                                reinterpret_cast<void**>(&SurfaceControl__GetSurface),
+                                "_ZNK7android14SurfaceControl10getSurfaceEv"
+                            },
+                        },
+                    },
+                    {
+                        9,
+                        {
 
-                                        {reinterpret_cast<void **>(&SurfaceComposerClient__CreateSurface),      "_ZN7android21SurfaceComposerClient13createSurfaceERKNS_7String8EjjijPNS_14SurfaceControlEii"},
-                                        {reinterpret_cast<void **>(&SurfaceComposerClient__GetBuiltInDisplay), "_ZN7android21SurfaceComposerClient17getBuiltInDisplayEi"},
-                                        {reinterpret_cast<void **>(&SurfaceControl__GetSurface), "_ZNK7android14SurfaceControl10getSurfaceEv"},
-                                },
+                            {
+                                reinterpret_cast<void**>(&SurfaceComposerClient__CreateSurface),
+                                "_ZN7android21SurfaceComposerClient13createSurfaceERKNS_7String8EjjijPNS_14SurfaceControlEii"
+                            },
+                            {
+                                reinterpret_cast<void**>(&SurfaceComposerClient__GetBuiltInDisplay),
+                                "_ZN7android21SurfaceComposerClient17getBuiltInDisplayEi"
+                            },
+                            {
+                                reinterpret_cast<void**>(&SurfaceControl__GetSurface),
+                                "_ZNK7android14SurfaceControl10getSurfaceEv"
+                            },
                         },
+                    },
+                    {
+                        8,
                         {
-                                8,
-                                {
 
-                                        {reinterpret_cast<void **>(&SurfaceComposerClient__CreateSurface),      "_ZN7android21SurfaceComposerClient13createSurfaceERKNS_7String8EjjijPNS_14SurfaceControlEjj"},
-                                        {reinterpret_cast<void **>(&SurfaceComposerClient__GetBuiltInDisplay), "_ZN7android21SurfaceComposerClient17getBuiltInDisplayEi"},
-                                        {reinterpret_cast<void **>(&SurfaceControl__GetSurface), "_ZNK7android14SurfaceControl10getSurfaceEv"},
-                                },
+                            {
+                                reinterpret_cast<void**>(&SurfaceComposerClient__CreateSurface),
+                                "_ZN7android21SurfaceComposerClient13createSurfaceERKNS_7String8EjjijPNS_14SurfaceControlEjj"
+                            },
+                            {
+                                reinterpret_cast<void**>(&SurfaceComposerClient__GetBuiltInDisplay),
+                                "_ZN7android21SurfaceComposerClient17getBuiltInDisplayEi"
+                            },
+                            {
+                                reinterpret_cast<void**>(&SurfaceControl__GetSurface),
+                                "_ZNK7android14SurfaceControl10getSurfaceEv"
+                            },
                         },
+                    },
                 };
 
 #ifdef __LP64__
@@ -272,7 +329,7 @@ namespace android {
                 ResolveMethod(SurfaceControl, DisConnect, libgui, "_ZN7android14SurfaceControl10disconnectEv");
 
                 if (patchesTable.contains(systemVersion)) {
-                    for (const auto &[patchTo, signature]: patchesTable.at(systemVersion)) {
+                    for (const auto& [patchTo, signature] : patchesTable.at(systemVersion)) {
                         *patchTo = symbolMethod.Find(libgui, signature);
                         if (nullptr != *patchTo)
                             continue;
@@ -285,8 +342,8 @@ namespace android {
                 symbolMethod.Close(libgui);
             }
 
-            static const Functionals &
-            GetInstance(const SymbolMethod &symbolMethod = {.Open = dlopen, .Find = dlsym, .Close = dlclose}) {
+            static const Functionals&
+            GetInstance(const SymbolMethod& symbolMethod = {.Open = dlopen, .Find = dlsym, .Close = dlclose}) {
                 static Functionals functionals(symbolMethod);
 
                 return functionals;
@@ -296,7 +353,7 @@ namespace android {
         struct String8 {
             char data[1024];
 
-            String8(const char *const string) {
+            String8(const char* const string) {
                 Functionals::GetInstance().String8__Constructor(data, string);
             }
 
@@ -304,8 +361,8 @@ namespace android {
                 Functionals::GetInstance().String8__Destructor(data);
             }
 
-            operator void *() {
-                return reinterpret_cast<void *>(data);
+            operator void*() {
+                return reinterpret_cast<void*>(data);
             }
         };
 
@@ -322,9 +379,9 @@ namespace android {
                     Functionals::GetInstance().LayerMetadata__setInt32(data, type, value);
             }
 
-            operator void *() {
+            operator void*() {
                 if (9 < Functionals::GetInstance().systemVersion)
-                    return reinterpret_cast<void *>(data);
+                    return reinterpret_cast<void*>(data);
                 else
                     return nullptr;
             }
@@ -334,11 +391,13 @@ namespace android {
         };
 
         struct SurfaceControl {
-            void *data;
+            void* data;
 
-            SurfaceControl() : data(nullptr) {}
+            SurfaceControl() : data(nullptr) {
+            }
 
-            SurfaceControl(void *data) : data(data) {}
+            SurfaceControl(void* data) : data(data) {
+            }
 
             int32_t Validate() {
                 if (nullptr == data)
@@ -347,14 +406,14 @@ namespace android {
                 return Functionals::GetInstance().SurfaceControl__Validate(data);
             }
 
-            Surface *GetSurface() {
+            Surface* GetSurface() {
                 if (nullptr == data)
                     return nullptr;
 
                 auto result = Functionals::GetInstance().SurfaceControl__GetSurface(data);
 
-                return reinterpret_cast<Surface *>(reinterpret_cast<size_t>(result.pointer) +
-                                                   sizeof(std::max_align_t) / 2);
+                return reinterpret_cast<Surface*>(reinterpret_cast<size_t>(result.pointer) +
+                    sizeof(std::max_align_t) / 2);
             }
 
             void DisConnect() {
@@ -364,13 +423,13 @@ namespace android {
                 Functionals::GetInstance().SurfaceControl__DisConnect(data);
             }
 
-            void DestroySurface(Surface *surface) {
+            void DestroySurface(Surface* surface) {
                 if (nullptr == data || nullptr == surface)
                     return;
 
                 Functionals::GetInstance().RefBase__DecStrong(
-                        reinterpret_cast<Surface *>(reinterpret_cast<size_t>(surface) - sizeof(std::max_align_t) / 2),
-                        this);
+                    reinterpret_cast<Surface*>(reinterpret_cast<size_t>(surface) - sizeof(std::max_align_t) / 2),
+                    this);
                 DisConnect();
                 Functionals::GetInstance().RefBase__DecStrong(data, this);
             }
@@ -383,24 +442,25 @@ namespace android {
                 Functionals::GetInstance().SurfaceComposerClient__Transaction__Constructor(data);
             }
 
-            void *SetLayer(StrongPointer<void> &surfaceControl, int32_t z) {
+            void* SetLayer(StrongPointer<void>& surfaceControl, int32_t z) {
                 return Functionals::GetInstance().SurfaceComposerClient__Transaction__SetLayer(data, surfaceControl, z);
             }
 
-            void *SetTrustedOverlay(StrongPointer<void> &surfaceControl, bool isTrustedOverlay) {
+            void* SetTrustedOverlay(StrongPointer<void>& surfaceControl, bool isTrustedOverlay) {
                 return Functionals::GetInstance().SurfaceComposerClient__Transaction__SetTrustedOverlay(data,
-                                                                                                        surfaceControl,
-                                                                                                        isTrustedOverlay);
+                    surfaceControl,
+                    isTrustedOverlay);
             }
 
             int32_t Apply(bool synchronous, bool oneWay) {
                 if (12 >= Functionals::GetInstance().systemVersion)
-                    return reinterpret_cast<int32_t (*)(void *,
-                                                        bool)>(Functionals::GetInstance().SurfaceComposerClient__Transaction__Apply)(
-                            data, synchronous);
+                    return reinterpret_cast<int32_t (*)(void*,
+                                                        bool)>(Functionals::GetInstance().
+                        SurfaceComposerClient__Transaction__Apply)(
+                        data, synchronous);
                 else
                     return Functionals::GetInstance().SurfaceComposerClient__Transaction__Apply(data, synchronous,
-                                                                                                oneWay);
+                        oneWay);
             }
         };
 
@@ -412,14 +472,14 @@ namespace android {
                 Functionals::GetInstance().RefBase__IncStrong(data, this);
             }
 
-            SurfaceControl CreateSurface(const char *name, int32_t width, int32_t height, bool hide, bool secure) {
-                void *parentHandle = nullptr;
+            SurfaceControl CreateSurface(const char* name, int32_t width, int32_t height, bool hide, bool secure) {
+                void* parentHandle = nullptr;
                 String8 windowName(name);
                 LayerMetadata layerMetadata;
                 uint32_t flags = secure ? 0x80 : 0;
 
                 if (12 <= Functionals::GetInstance().systemVersion) {
-                    static void *fakeParentHandleForBinder = nullptr;
+                    static void* fakeParentHandleForBinder = nullptr;
                     parentHandle = &fakeParentHandleForBinder;
                 }
 
@@ -429,12 +489,12 @@ namespace android {
                     if (!secure && hide)
                         value = 441731;
 
-                    result = reinterpret_cast<StrongPointer<void> (*)(void *, void *, uint32_t, uint32_t, int32_t,
-                                                                      uint32_t, void *, int32_t, int32_t)>(
-                            Functionals::GetInstance().SurfaceComposerClient__CreateSurface)(data, windowName, width,
-                                                                                             height, 1, flags,
-                                                                                             nullptr,
-                                                                                             value, -1);
+                    result = reinterpret_cast<StrongPointer<void> (*)(void*, void*, uint32_t, uint32_t, int32_t,
+                                                                      uint32_t, void*, int32_t, int32_t)>(
+                        Functionals::GetInstance().SurfaceComposerClient__CreateSurface)(data, windowName, width,
+                        height, 1, flags,
+                        nullptr,
+                        value, -1);
                 } else {
                     if (!secure && hide) {
                         if (Functionals::GetInstance().systemVersion > 9 &&
@@ -445,9 +505,9 @@ namespace android {
                         }
                     }
                     result = Functionals::GetInstance().SurfaceComposerClient__CreateSurface(data, windowName, width,
-                                                                                             height, 1, flags,
-                                                                                             parentHandle,
-                                                                                             layerMetadata, nullptr);
+                        height, 1, flags,
+                        parentHandle,
+                        layerMetadata, nullptr);
                 }
 
                 if (12 <= Functionals::GetInstance().systemVersion) {
@@ -460,12 +520,12 @@ namespace android {
                 return {result.get()};
             }
 
-            bool GetDisplayInfo(ui::DisplayState *displayInfo) {
+            bool GetDisplayInfo(ui::DisplayState* displayInfo) {
                 StrongPointer<void> defaultDisplay;
 
                 if (9 >= Functionals::GetInstance().systemVersion)
                     defaultDisplay = Functionals::GetInstance().SurfaceComposerClient__GetBuiltInDisplay(
-                            ui::DisplayType::DisplayIdMain);
+                        ui::DisplayType::DisplayIdMain);
                 else {
                     if (14 > Functionals::GetInstance().systemVersion)
                         defaultDisplay = Functionals::GetInstance().SurfaceComposerClient__GetInternalDisplayToken();
@@ -475,7 +535,7 @@ namespace android {
                             return false;
 
                         defaultDisplay = Functionals::GetInstance().SurfaceComposerClient__GetPhysicalDisplayToken(
-                                displayIds[0]);
+                            displayIds[0]);
                     }
                 }
 
@@ -484,11 +544,11 @@ namespace android {
 
                 if (11 <= Functionals::GetInstance().systemVersion)
                     return 0 == Functionals::GetInstance().SurfaceComposerClient__GetDisplayState(defaultDisplay,
-                                                                                                  displayInfo);
+                        displayInfo);
                 else {
                     ui::DisplayInfo realDisplayInfo{};
                     if (0 != Functionals::GetInstance().SurfaceComposerClient__GetDisplayInfo(defaultDisplay,
-                                                                                              &realDisplayInfo))
+                        &realDisplayInfo))
                         return false;
 
                     displayInfo->layerStackSpaceRect.width = realDisplayInfo.w;
@@ -510,29 +570,29 @@ namespace android {
         };
 
     public:
-        static detail::SurfaceComposerClient &GetComposerInstance() {
+        static detail::SurfaceComposerClient& GetComposerInstance() {
             static detail::SurfaceComposerClient surfaceComposerClient;
 
             return surfaceComposerClient;
         }
 
         static DisplayInfo GetDisplayInfo() {
-            auto &surfaceComposerClient = GetComposerInstance();
+            auto& surfaceComposerClient = GetComposerInstance();
             detail::ui::DisplayState displayInfo{};
 
             if (!surfaceComposerClient.GetDisplayInfo(&displayInfo))
                 return {};
 
             return DisplayInfo{
-                    .orientation = static_cast<uint32_t>(displayInfo.orientation),
-                    .width = displayInfo.layerStackSpaceRect.width,
-                    .height = displayInfo.layerStackSpaceRect.height,
+                .orientation = static_cast<uint32_t>(displayInfo.orientation),
+                .width = displayInfo.layerStackSpaceRect.width,
+                .height = displayInfo.layerStackSpaceRect.height,
             };
         }
 
-        static ANativeWindow *
-        Create(const char *name, int32_t width = -1, int32_t height = -1, bool hide = true, bool secure = false) {
-            auto &surfaceComposerClient = GetComposerInstance();
+        static ANativeWindow*
+        Create(const char* name, int32_t width = -1, int32_t height = -1, bool hide = true, bool secure = false) {
+            auto& surfaceComposerClient = GetComposerInstance();
 
             while (-1 == width || -1 == height) {
                 detail::ui::DisplayState displayInfo{};
@@ -547,22 +607,22 @@ namespace android {
             }
 
             auto surfaceControl = surfaceComposerClient.CreateSurface(name, width, height, hide, secure);
-            auto nativeWindow = reinterpret_cast<ANativeWindow *>(surfaceControl.GetSurface());
+            auto nativeWindow = reinterpret_cast<ANativeWindow*>(surfaceControl.GetSurface());
 
             m_cachedSurfaceControl.emplace(nativeWindow, surfaceControl);
             return nativeWindow;
         }
 
-        static void Destroy(ANativeWindow *nativeWindow) {
+        static void Destroy(ANativeWindow* nativeWindow) {
             if (!m_cachedSurfaceControl.contains(nativeWindow))
                 return;
 
-            m_cachedSurfaceControl[nativeWindow].DestroySurface(reinterpret_cast<detail::Surface *>(nativeWindow));
+            m_cachedSurfaceControl[nativeWindow].DestroySurface(reinterpret_cast<detail::Surface*>(nativeWindow));
             m_cachedSurfaceControl.erase(nativeWindow);
         }
 
     private:
-        inline static std::unordered_map<ANativeWindow *, detail::SurfaceControl> m_cachedSurfaceControl;
+        inline static std::unordered_map<ANativeWindow*, detail::SurfaceControl> m_cachedSurfaceControl;
     };
 }
 

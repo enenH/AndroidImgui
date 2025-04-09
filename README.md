@@ -20,7 +20,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(AndroidImgui)  # 下载并使库可用
 
 
-target_link_libraries(your_lib_name AndroidImgui)  # 链接库
+target_link_libraries(your_lib_name AndroidImgui freetype)  # 链接库
 
 ```
 

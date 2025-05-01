@@ -61,7 +61,7 @@ bool VulkanGraphics::Create() {
 
     //为imgui加载vulkan函数
     void *libvulkan = dlopen("libvulkan.so", RTLD_NOW);
-    ImGui_ImplVulkan_LoadFunctions([](const char *function_name, void *handle) -> PFN_vkVoidFunction {
+    ImGui_ImplVulkan_LoadFunctions(0,[](const char *function_name, void *handle) -> PFN_vkVoidFunction {
         return reinterpret_cast<PFN_vkVoidFunction>(dlsym(handle, function_name));
     }, libvulkan);
 

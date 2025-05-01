@@ -26,6 +26,8 @@ add_library(AndroidImgui STATIC
         ${SOURCES}
 
         stb/stb_image.c
+        src/ELF/elf_util.cpp
+        src/Jenv/JavaFunc.cpp
 
         imgui/imgui.cpp
         imgui/imgui_draw.cpp
@@ -35,6 +37,7 @@ add_library(AndroidImgui STATIC
         imgui/backends/imgui_impl_opengl3.cpp
         imgui/backends/imgui_impl_vulkan.cpp
         imgui/misc/freetype/imgui_freetype.cpp
+
 )
 
 target_include_directories(AndroidImgui PUBLIC
@@ -54,17 +57,16 @@ target_link_libraries(AndroidImgui
         android
         EGL
         GLESv3
-        z)
+        z
+        freetype)
 
 
-
-#[[add_executable(AndroidImguiTest
-        test/main.cpp
+add_executable(AndroidImguiTest
+        test/main3.cpp
         test/TouchHelperA.cpp)
 
 target_link_libraries(AndroidImguiTest
         AndroidImgui
-        freetype
-)]]
+)
 
 #[[git submodule update --remote imgui]]

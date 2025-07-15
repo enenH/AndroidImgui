@@ -62,7 +62,7 @@ target_link_libraries(AndroidImgui
 
 
 add_executable(AndroidImguiTest
-        test/main.cpp
+        test/main3.cpp
         test/TouchHelperA.cpp)
 
 target_link_libraries(AndroidImguiTest

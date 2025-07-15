@@ -13,7 +13,7 @@ int main() {
 
     graphics->Init(window, display.width, display.width);
     ImGui::Android_LoadSystemFont(26);
-    Touch::Init({(float) display.width, (float) display.height}, true);
+    Touch::Init({(float)display.width, (float)display.height}, true);
 
     static bool flag = true;
     while (flag) {
@@ -22,7 +22,6 @@ int main() {
         ImGui::SetNextWindowSize({500, 500}, ImGuiCond_Once);
         if (ImGui::Begin("test", &flag)) {
             ImGui::Text("Hello, world!");
-
         }
         ImGui::End();
 

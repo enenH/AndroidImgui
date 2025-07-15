@@ -14,7 +14,7 @@ include(FetchContent)
 FetchContent_Declare(
         AndroidImgui  # 你的库名
         GIT_REPOSITORY https://github.com/enenH/AndroidImgui.git  # GitHub库的URL
-        GIT_TAG v1.9 # 你想要的分支或标签
+        GIT_TAG v2.0 # 你想要的分支或标签
 )
 
 FetchContent_MakeAvailable(AndroidImgui)  # 下载并使库可用

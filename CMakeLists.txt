@@ -61,13 +61,13 @@ target_link_libraries(AndroidImgui
         freetype)
 
 
-add_executable(AndroidImguiTest
+#[[add_executable(AndroidImguiTest
         test/main3.cpp
         test/TouchHelperA.cpp)
 
 target_link_libraries(AndroidImguiTest
         AndroidImgui
-)
+)]]
 
 
 #[[git submodule update --remote imgui]]

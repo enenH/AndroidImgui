@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "ANativeWindowCreator.h"
 #include "GraphicsManager.h"
 #include "my_imgui.h"
@@ -9,7 +11,7 @@ int main() {
         std::swap(display.height, display.width);
     }
     auto window = android::ANativeWindowCreator::Create("test", display.width, display.width);
-    auto graphics = GraphicsManager::getGraphicsInterface(GraphicsManager::VULKAN);
+    auto graphics = GraphicsManager::getGraphicsInterface(GraphicsManager::SOFTWARE);
 
     graphics->Init(window, display.width, display.width);
     ImGui::Android_LoadSystemFont(26);
@@ -21,12 +23,15 @@ int main() {
         Touch::setOrientation(android::ANativeWindowCreator::GetDisplayInfo().orientation);
         ImGui::SetNextWindowSize({500, 500}, ImGuiCond_Once);
         if (ImGui::Begin("test", &flag)) {
-            ImGui::Text("Hello, world!");
+            ImGui::Text("%.1f ms %.1f FPS", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+            ImGui::Text("漨悋孄憀弖嫮廼怮圜爘楱濲墈垉");
         }
         ImGui::End();
-
         graphics->EndFrame();
     }
     graphics->Shutdown();
+    android::ANativeWindowCreator::Destroy(window);
+    sleep(1);
     return 0;
 }

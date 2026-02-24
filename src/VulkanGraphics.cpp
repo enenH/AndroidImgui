@@ -19,7 +19,6 @@ static void check_vk_result(VkResult err) {
 #else
 
 static void check_vk_result(VkResult err) {
-
 }
 
 #endif
@@ -38,7 +37,7 @@ VkPhysicalDevice VulkanGraphics::SetupVulkan_SelectPhysicalDevice() {
     // If a number >1 of GPUs got reported, find discrete GPU if present, or use first one available. This covers
     // most common cases (multi-gpu/integrated+dedicated graphics). Handling more complicated setups (multiple
     // dedicated GPUs) is out of scope of this sample.
-    for (VkPhysicalDevice &device: gpus) {
+    for (VkPhysicalDevice& device : gpus) {
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(device, &properties);
         if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
@@ -60,26 +59,26 @@ bool VulkanGraphics::Create() {
     wd = std::make_unique<ImGui_ImplVulkanH_Window>();
 
     //为imgui加载vulkan函数
-    void *libvulkan = dlopen("libvulkan.so", RTLD_NOW);
-    ImGui_ImplVulkan_LoadFunctions(0,[](const char *function_name, void *handle) -> PFN_vkVoidFunction {
+    void* libvulkan = dlopen("libvulkan.so", RTLD_NOW);
+    ImGui_ImplVulkan_LoadFunctions(0, [](const char* function_name, void* handle) -> PFN_vkVoidFunction {
         return reinterpret_cast<PFN_vkVoidFunction>(dlsym(handle, function_name));
     }, libvulkan);
 
     VkResult err;
     // Create Vulkan Instance
     {
-        const char *instance_extensions[] = {
-                "VK_KHR_surface",
-                "VK_KHR_android_surface",
+        const char* instance_extensions[] = {
+            "VK_KHR_surface",
+            "VK_KHR_android_surface",
         };
         VkApplicationInfo appInfo = {
-                .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-                .pNext = nullptr,
-                .pApplicationName = "pApplicationName",
-                .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
-                .pEngineName = "pEngineName",
-                .engineVersion = VK_MAKE_VERSION(1, 0, 0),
-                .apiVersion = VK_MAKE_VERSION(1, 1, 0),
+            .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
+            .pNext = nullptr,
+            .pApplicationName = "pApplicationName",
+            .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
+            .pEngineName = "pEngineName",
+            .engineVersion = VK_MAKE_VERSION(1, 0, 0),
+            .apiVersion = VK_MAKE_VERSION(1, 1, 0),
         };
         VkInstanceCreateInfo create_info = {};
         create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -88,34 +87,36 @@ bool VulkanGraphics::Create() {
         create_info.ppEnabledExtensionNames = instance_extensions;
 #ifdef IMGUI_VULKAN_DEBUG_REPORT
         // Enabling validation layers
-            const char* layers[] = { "VK_LAYER_KHRONOS_validation" };
-            create_info.enabledLayerCount = 1;
-            create_info.ppEnabledLayerNames = layers;
+        const char* layers[] = {"VK_LAYER_KHRONOS_validation"};
+        create_info.enabledLayerCount = 1;
+        create_info.ppEnabledLayerNames = layers;
 
-            // Enable debug report extension (we need additional storage, so we duplicate the user array to add our new extension to it)
-            const char** extensions_ext = (const char**)malloc(sizeof(const char*) * (extensions_count + 1));
-            memcpy(extensions_ext, extensions, extensions_count * sizeof(const char*));
-            extensions_ext[extensions_count] = "VK_EXT_debug_report";
-            create_info.enabledExtensionCount = extensions_count + 1;
-            create_info.ppEnabledExtensionNames = extensions_ext;
+        // Enable debug report extension (we need additional storage, so we duplicate the user array to add our new extension to it)
+        const char** extensions_ext = (const char**)malloc(sizeof(const char*) * (extensions_count + 1));
+        memcpy(extensions_ext, extensions, extensions_count * sizeof(const char*));
+        extensions_ext[extensions_count] = "VK_EXT_debug_report";
+        create_info.enabledExtensionCount = extensions_count + 1;
+        create_info.ppEnabledExtensionNames = extensions_ext;
 
-            // Create Vulkan Instance
-            err = vkCreateInstance(&create_info, g_Allocator, &g_Instance);
-            check_vk_result(err);
-            free(extensions_ext);
+        // Create Vulkan Instance
+        err = vkCreateInstance(&create_info, g_Allocator, &g_Instance);
+        check_vk_result(err);
+        free(extensions_ext);
 
-            // Get the function pointer (required for any extensions)
-            auto vkCreateDebugReportCallbackEXT = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(g_Instance, "vkCreateDebugReportCallbackEXT");
-            IM_ASSERT(vkCreateDebugReportCallbackEXT != NULL);
+        // Get the function pointer (required for any extensions)
+        auto vkCreateDebugReportCallbackEXT = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(
+            g_Instance, "vkCreateDebugReportCallbackEXT");
+        IM_ASSERT(vkCreateDebugReportCallbackEXT != NULL);
 
-            // Setup the debug report callback
-            VkDebugReportCallbackCreateInfoEXT debug_report_ci = {};
-            debug_report_ci.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
-            debug_report_ci.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
-            debug_report_ci.pfnCallback = debug_report;
-            debug_report_ci.pUserData = NULL;
-            err = vkCreateDebugReportCallbackEXT(g_Instance, &debug_report_ci, g_Allocator, &g_DebugReport);
-            check_vk_result(err);
+        // Setup the debug report callback
+        VkDebugReportCallbackCreateInfoEXT debug_report_ci = {};
+        debug_report_ci.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
+        debug_report_ci.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT |
+            VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
+        debug_report_ci.pfnCallback = debug_report;
+        debug_report_ci.pUserData = NULL;
+        err = vkCreateDebugReportCallbackEXT(g_Instance, &debug_report_ci, g_Allocator, &g_DebugReport);
+        check_vk_result(err);
 #else
         // Create Vulkan Instance without any debug feature
         err = vkCreateInstance(&create_info, m_Allocator, &m_Instance);
@@ -131,7 +132,7 @@ bool VulkanGraphics::Create() {
     {
         uint32_t count;
         vkGetPhysicalDeviceQueueFamilyProperties(m_PhysicalDevice, &count, nullptr);
-        VkQueueFamilyProperties *queues = (VkQueueFamilyProperties *) malloc(sizeof(VkQueueFamilyProperties) * count);
+        VkQueueFamilyProperties* queues = (VkQueueFamilyProperties*)malloc(sizeof(VkQueueFamilyProperties) * count);
         vkGetPhysicalDeviceQueueFamilyProperties(m_PhysicalDevice, &count, queues);
         for (uint32_t i = 0; i < count; i++)
             if (queues[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
@@ -144,7 +145,7 @@ bool VulkanGraphics::Create() {
 
     // Create Logical Device (with 1 queue)
     {
-        ImVector<const char *> device_extensions;
+        ImVector<const char*> device_extensions;
         device_extensions.push_back("VK_KHR_swapchain");
 
         // Enumerate physical device extension
@@ -168,7 +169,7 @@ bool VulkanGraphics::Create() {
         create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         create_info.queueCreateInfoCount = sizeof(queue_info) / sizeof(queue_info[0]);
         create_info.pQueueCreateInfos = queue_info;
-        create_info.enabledExtensionCount = (uint32_t) device_extensions.Size;
+        create_info.enabledExtensionCount = (uint32_t)device_extensions.Size;
         create_info.ppEnabledExtensionNames = device_extensions.Data;
         err = vkCreateDevice(m_PhysicalDevice, &create_info, m_Allocator, &m_Device);
         check_vk_result(err);
@@ -177,24 +178,24 @@ bool VulkanGraphics::Create() {
     // Create Descriptor Pool
     {
         VkDescriptorPoolSize pool_sizes[] =
-                {
-                        {VK_DESCRIPTOR_TYPE_SAMPLER,                1000},
-                        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
-                        {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,          1000},
-                        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,          1000},
-                        {VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER,   1000},
-                        {VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER,   1000},
-                        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         1000},
-                        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,         1000},
-                        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
-                        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
-                        {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT,       1000}
-                };
+        {
+            {VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
+            {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
+            {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000},
+            {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000},
+            {VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000},
+            {VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000},
+            {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000},
+            {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000},
+            {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
+            {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
+            {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000}
+        };
         VkDescriptorPoolCreateInfo pool_info = {};
         pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
         pool_info.maxSets = 1000 * IM_ARRAYSIZE(pool_sizes);
-        pool_info.poolSizeCount = (uint32_t) IM_ARRAYSIZE(pool_sizes);
+        pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
         pool_info.pPoolSizes = pool_sizes;
         err = vkCreateDescriptorPool(m_Device, &pool_info, m_Allocator, &m_DescriptorPool);
         check_vk_result(err);
@@ -203,10 +204,11 @@ bool VulkanGraphics::Create() {
         // Create Window Surface
         VkSurfaceKHR surface;
         VkAndroidSurfaceCreateInfoKHR createInfo{
-                .sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR,
-                .pNext = nullptr,
-                .flags = 0,
-                .window = m_Window};
+            .sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR,
+            .pNext = nullptr,
+            .flags = 0,
+            .window = m_Window
+        };
 
         err = vkCreateAndroidSurfaceKHR(m_Instance, &createInfo, m_Allocator,
                                         &surface);
@@ -221,17 +223,21 @@ bool VulkanGraphics::Create() {
             exit(-1);
         }
         // Select Surface Format
-        const VkFormat requestSurfaceImageFormat[] = {VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM,
-                                                      VK_FORMAT_B8G8R8_UNORM, VK_FORMAT_R8G8B8_UNORM};
+        const VkFormat requestSurfaceImageFormat[] = {
+            VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM,
+            VK_FORMAT_B8G8R8_UNORM, VK_FORMAT_R8G8B8_UNORM
+        };
         const VkColorSpaceKHR requestSurfaceColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
         wd->SurfaceFormat = ImGui_ImplVulkanH_SelectSurfaceFormat(m_PhysicalDevice, wd->Surface,
                                                                   requestSurfaceImageFormat,
-                                                                  (size_t) IM_ARRAYSIZE(requestSurfaceImageFormat),
+                                                                  (size_t)IM_ARRAYSIZE(requestSurfaceImageFormat),
                                                                   requestSurfaceColorSpace);
 
         // Select Present Mode
 #ifdef APP_USE_UNLIMITED_FRAME_RATE
-        VkPresentModeKHR present_modes[] = { VK_PRESENT_MODE_MAILBOX_KHR, VK_PRESENT_MODE_IMMEDIATE_KHR, VK_PRESENT_MODE_FIFO_KHR };
+        VkPresentModeKHR present_modes[] = {
+            VK_PRESENT_MODE_MAILBOX_KHR, VK_PRESENT_MODE_IMMEDIATE_KHR, VK_PRESENT_MODE_FIFO_KHR
+        };
 #else
         VkPresentModeKHR present_modes[] = {VK_PRESENT_MODE_FIFO_KHR};
 #endif
@@ -243,7 +249,7 @@ bool VulkanGraphics::Create() {
         IM_ASSERT(m_MinImageCount >= 2);
         ImGui_ImplVulkanH_CreateOrResizeWindow(m_Instance, m_PhysicalDevice, m_Device, wd.get(), m_QueueFamily,
                                                m_Allocator,
-                                               (int) m_Width, (int) m_Height, m_MinImageCount);
+                                               (int)m_Width, (int)m_Height, m_MinImageCount, 0);
     }
 
     return true;
@@ -258,11 +264,11 @@ void VulkanGraphics::Setup() {
     init_info.Queue = m_Queue;
     init_info.PipelineCache = m_PipelineCache;
     init_info.DescriptorPool = m_DescriptorPool;
-    init_info.RenderPass = wd->RenderPass;
-    init_info.Subpass = 0;
+    init_info.PipelineInfoMain.RenderPass = wd->RenderPass;
+    init_info.PipelineInfoMain.Subpass = 0;
+    init_info.PipelineInfoMain.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
     init_info.MinImageCount = m_MinImageCount;
     init_info.ImageCount = wd->ImageCount;
-    init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
     init_info.Allocator = m_Allocator;
     init_info.CheckVkResultFn = check_vk_result;
     ImGui_ImplVulkan_Init(&init_info);
@@ -284,7 +290,7 @@ void VulkanGraphics::PrepareFrame(bool resize) {
                 m_LastHeight = height;
                 ImGui_ImplVulkan_SetMinImageCount(m_MinImageCount);
                 ImGui_ImplVulkanH_CreateOrResizeWindow(m_Instance, m_PhysicalDevice, m_Device, wd.get(),
-                                                       m_QueueFamily, m_Allocator, width, height, m_MinImageCount);
+                                                       m_QueueFamily, m_Allocator, width, height, m_MinImageCount, 0);
                 wd->FrameIndex = 0;
                 m_SwapChainRebuild = false;
             }
@@ -293,7 +299,7 @@ void VulkanGraphics::PrepareFrame(bool resize) {
     ImGui_ImplVulkan_NewFrame();
 }
 
-void VulkanGraphics::Render(ImDrawData *drawData) {
+void VulkanGraphics::Render(ImDrawData* drawData) {
     VkResult err;
 
     VkSemaphore image_acquired_semaphore = wd->FrameSemaphores[wd->SemaphoreIndex].ImageAcquiredSemaphore;
@@ -306,10 +312,10 @@ void VulkanGraphics::Render(ImDrawData *drawData) {
     }
     //check_vk_result(err);
 
-    ImGui_ImplVulkanH_Frame *fd = &wd->Frames[wd->FrameIndex];
+    ImGui_ImplVulkanH_Frame* fd = &wd->Frames[wd->FrameIndex];
     {
         err = vkWaitForFences(m_Device, 1, &fd->Fence, VK_TRUE,
-                              UINT64_MAX);    // wait indefinitely instead of periodically checking
+                              UINT64_MAX); // wait indefinitely instead of periodically checking
         check_vk_result(err);
 
         err = vkResetFences(m_Device, 1, &fd->Fence);
@@ -394,7 +400,8 @@ void VulkanGraphics::Cleanup() {
 
 #ifdef APP_USE_VULKAN_DEBUG_REPORT
     // Remove the debug report callback
-    auto vkDestroyDebugReportCallbackEXT = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(g_Instance, "vkDestroyDebugReportCallbackEXT");
+    auto vkDestroyDebugReportCallbackEXT = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(
+        g_Instance, "vkDestroyDebugReportCallbackEXT");
     vkDestroyDebugReportCallbackEXT(g_Instance, g_DebugReport, g_Allocator);
 #endif // APP_USE_VULKAN_DEBUG_REPORT
 
@@ -414,8 +421,8 @@ uint32_t VulkanGraphics::findMemoryType(uint32_t type_filter, VkMemoryPropertyFl
     return 0xFFFFFFFF; // Unable to find memoryType
 }
 
-BaseTexData *VulkanGraphics::LoadTexture(BaseTexData *tex, void *pixel_data) {
-    auto *tex_data = new VulkanTextureData();
+BaseTexData* VulkanGraphics::LoadTexture(BaseTexData* tex, void* pixel_data) {
+    auto* tex_data = new VulkanTextureData();
     tex_data->Width = tex->Width;
     tex_data->Height = tex->Height;
     tex_data->Channels = tex->Channels;
@@ -487,8 +494,8 @@ BaseTexData *VulkanGraphics::LoadTexture(BaseTexData *tex, void *pixel_data) {
     }
 
     // Create Descriptor Set using ImGUI's implementation
-    tex_data->DS = (void *) ImGui_ImplVulkan_AddTexture(tex_data->Sampler, tex_data->ImageView,
-                                                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    tex_data->DS = (void*)ImGui_ImplVulkan_AddTexture(tex_data->Sampler, tex_data->ImageView,
+                                                      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     // Create Upload Buffer
     {
@@ -513,7 +520,7 @@ BaseTexData *VulkanGraphics::LoadTexture(BaseTexData *tex, void *pixel_data) {
 
     // Upload to Buffer:
     {
-        void *map = NULL;
+        void* map = NULL;
         err = vkMapMemory(m_Device, tex_data->UploadBufferMemory, 0, image_size, 0, &map);
         check_vk_result(err);
         memcpy(map, pixel_data, image_size);
@@ -607,15 +614,14 @@ BaseTexData *VulkanGraphics::LoadTexture(BaseTexData *tex, void *pixel_data) {
     return tex_data;
 }
 
-void VulkanGraphics::RemoveTexture(BaseTexData *tex) {
-    auto *tex_data = (VulkanTextureData *) (tex);
+void VulkanGraphics::RemoveTexture(BaseTexData* tex) {
+    auto* tex_data = (VulkanTextureData*)(tex);
     vkFreeMemory(m_Device, tex_data->UploadBufferMemory, nullptr);
     vkDestroyBuffer(m_Device, tex_data->UploadBuffer, nullptr);
     vkDestroySampler(m_Device, tex_data->Sampler, nullptr);
     vkDestroyImageView(m_Device, tex_data->ImageView, nullptr);
     vkDestroyImage(m_Device, tex_data->Image, nullptr);
     vkFreeMemory(m_Device, tex_data->ImageMemory, nullptr);
-    ImGui_ImplVulkan_RemoveTexture((VkDescriptorSet) tex_data->DS);
+    ImGui_ImplVulkan_RemoveTexture((VkDescriptorSet)tex_data->DS);
     delete tex_data;
 }
-

@@ -13,7 +13,8 @@ class GraphicsManager {
 public:
     enum GraphicsAPI {
         OPENGL,
-        VULKAN
+        VULKAN,
+        SOFTWARE
     };
 
     static std::unique_ptr<AndroidImgui> getGraphicsInterface(GraphicsAPI api);
